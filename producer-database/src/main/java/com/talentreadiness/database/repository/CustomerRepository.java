@@ -9,6 +9,6 @@ import com.talentreadiness.database.model.Customer;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    @Query("SELECT c FROM Customer c WHERE (:search IS NULL OR LOWER (c.name) LIKE %:search% OR LOWER(c.age) LIKE %:search% )")
+    @Query("SELECT c FROM Customer c WHERE (:search IS NULL OR LOWER (c.name) LIKE %:search% )")
     Page<Customer> findCustomerAll(Pageable pageable, String search);
 }

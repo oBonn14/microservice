@@ -11,8 +11,8 @@
 	<packaging>jar</packaging>
 	<artifactId>consumer-elasticsearch</artifactId>
 	<properties>
-		 <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
+		 <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -30,7 +30,7 @@
 			<groupId>com.talentreadiness</groupId>
 			<artifactId>producer-database</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

@@ -19,6 +19,8 @@ import com.talentreadiness.database.dto.MessageDTO;
 import com.talentreadiness.database.model.Customer;
 import com.talentreadiness.database.repository.CustomerRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,10 +49,11 @@ public class CustomerService {
                 .build();
     }
 
+    @Transactional
     public Customer storeCustomer(CustomerDTO customerDTO) {
         try {
             Customer data = Customer.builder()
-                    .name(customerDTO.getName())
+                    .name(customerDTO.getName().trim())
                     .age(customerDTO.getAge())
                     .build();
 
@@ -63,6 +66,44 @@ public class CustomerService {
         } catch (Exception ex) {
             log.error("Error storing customer data", ex);
             throw new RuntimeException("Error storing customer data", ex);
+        }
+    }
+
+    @Transactional
+    public Customer updateCustomer(Long id, CustomerDTO customerDTO) {
+        try {
+            Customer customerId = customerRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Id Customer Not Found"));
+            Customer customerUpdate = Customer.builder()
+                    .id(customerId.getId())
+                    .name(customerDTO.getName())
+                    .age(customerDTO.getAge())
+                    .build();
+            MessageDTO message = new MessageDTO("PUT", customerUpdate);
+            LOGGER.info("Request To Update Data -> {}", message);
+            sendMessageToKafka(message);
+
+            return customerRepository.save(customerUpdate);
+        } catch (Exception ex) {
+            log.info(ex.getMessage());
+            throw ex;
+        }
+    }
+
+    @Transactional
+    public void deleteCustomer(Long id) {
+        try {
+            Customer customerId = customerRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Id Customer Not Found"));
+
+            MessageDTO message = new MessageDTO("DELETE", customerId);
+            LOGGER.info("Request To Delete Data -> {}", message);
+            sendMessageToKafka(message);
+
+            customerRepository.delete(customerId);
+        } catch (Exception ex) {
+            log.info(ex.getMessage());
+            throw ex;
         }
     }
 
