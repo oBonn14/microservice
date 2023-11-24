@@ -1,5 +1,8 @@
 package com.talentreadiness.consumerredis.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +30,11 @@ public class RedisService {
 
     @KafkaListener(topics = "topic-customer", groupId = "consumergroup")
     public void manageCustomer(MessageDTO messageDTO) {
+
         LOGGER.info("Message Received -> {}", messageDTO);
         String method = messageDTO.getMethod();
         CustomerDTO data = new CustomerDTO();
+
         data.setId(messageDTO.getCustomer().getId());
         data.setName(messageDTO.getCustomer().getName());
         data.setAge(messageDTO.getCustomer().getAge());
@@ -40,8 +45,12 @@ public class RedisService {
         }
     }
 
-    public Page<Customer> getAllCustomer(Pageable pageable, String search) {
-        return customerRepository.findCustomerAll(pageable, search);
+    public List<CustomerDTO> getAllRedisCustomer() {
+        List<CustomerDTO> customerList = redisTemplate.opsForHash().values(KEY);
+        if (customerList.isEmpty()) {
+            return new ArrayList<CustomerDTO>();
+        }
+        return customerList;
     }
 
 }

@@ -1,6 +1,8 @@
 package com.talentreadiness.consumerredis.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +12,7 @@ import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.talentreadiness.consumerredis.service.RedisService;
@@ -28,10 +31,13 @@ public class RedisController {
     private final CustomerService customerService;
 
     @GetMapping
-    public ResponseEntity<Object> getAllCustomerRedis(Pageable pageable, String search) {
-        Page<Customer> customer = redisService.getAllCustomer(pageable, search);
-        List<CustomerDTO> data = customerService.getListCustomer(customer);
-        return ResponseEntity.ok(PagedModel.of(data,
-                new PageMetadata(customer.getNumber(), customer.getSize(), customer.getNumberOfElements())));
+    @ResponseBody
+    public ResponseEntity<?> getAllRedisCustomerData() {
+        List<CustomerDTO> customerList = redisService.getAllRedisCustomer();
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "Customer loaded successfully");
+        response.put("data", customerList);
+        return ResponseEntity.ok(response);
     }
 }

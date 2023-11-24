@@ -50,19 +50,16 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer storeCustomer(CustomerDTO customerDTO) {
+    public Customer storeCustomer(Customer customerDTO) {
         try {
-            Customer data = Customer.builder()
-                    .name(customerDTO.getName().trim())
-                    .age(customerDTO.getAge())
-                    .build();
+            Customer data = customerRepository.save(customerDTO);
 
             MessageDTO messageDTO = new MessageDTO("POST", data);
             LOGGER.info("Request To Store Data -> {}", messageDTO);
 
             sendMessageToKafka(messageDTO);
 
-            return customerRepository.save(data);
+            return data;
         } catch (Exception ex) {
             log.error("Error storing customer data", ex);
             throw new RuntimeException("Error storing customer data", ex);
@@ -70,20 +67,19 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer updateCustomer(Long id, CustomerDTO customerDTO) {
+    public Customer updateCustomer(Long id, Customer customerDTO) {
         try {
+            Customer customerUpdate = new Customer();
             Customer customerId = customerRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Id Customer Not Found"));
-            Customer customerUpdate = Customer.builder()
-                    .id(customerId.getId())
-                    .name(customerDTO.getName())
-                    .age(customerDTO.getAge())
-                    .build();
+            if (customerId != null) {
+                customerUpdate = customerRepository.save(customerDTO);
+            }
             MessageDTO message = new MessageDTO("PUT", customerUpdate);
             LOGGER.info("Request To Update Data -> {}", message);
             sendMessageToKafka(message);
 
-            return customerRepository.save(customerUpdate);
+            return customerUpdate;
         } catch (Exception ex) {
             log.info(ex.getMessage());
             throw ex;

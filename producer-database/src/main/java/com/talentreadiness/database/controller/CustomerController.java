@@ -45,7 +45,7 @@ public class CustomerController {
     }
 
     @PostMapping("/createCustomer")
-    public ResponseEntity<Object> createCustomer(@RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<Object> createCustomer(@RequestBody Customer customerDTO) {
         try {
             var o = customerService.storeCustomer(customerDTO);
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -60,7 +60,7 @@ public class CustomerController {
     }
 
     @PutMapping("/updateCustomer/{id}")
-    public ResponseEntity<Object> updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<Object> updateCustomer(@PathVariable Long id, @RequestBody Customer customerDTO) {
         try {
             var o = customerService.updateCustomer(id, customerDTO);
             return ResponseEntity.status(HttpStatus.OK)
